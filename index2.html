@@ -13,8 +13,20 @@
         }
         
      body {
+        background: linear-gradient(135deg, #F9ECD6 0%, #FCCDA0 40%, #FBAA91 70%, #5EAAB5 90%, #01409C 100%);
+        overflow-x: hidden;
+        animation: gradientShift 15s ease infinite alternate;
+        background-size: 300% 300%;
+     }
 
-}
+     @keyframes gradientShift {
+         0% {
+             background-position: 0% 0%;
+         }
+         100% {
+             background-position: 100% 100%;
+         }
+     }
 
 body::before {
     content: '';
@@ -26,7 +38,7 @@ body::before {
     background-image: url('images/vinyl-texture.jpg');
     background-size: cover;
     background-blend-mode: overlay;
-    opacity: 0.3; /* 투명도 조절 */
+    opacity: 0.1; /* 투명도 조절 */
     z-index: -1; /* 내용물 뒤에 배치 */
 }
         
@@ -41,6 +53,7 @@ body::before {
             width: 1000px; /* 이미지 크기 */
             height: 1000px;
             transition: left 0.8s ease-in-out; /* 가로 이동만 애니메이션 */
+            filter: drop-shadow(0 0 15px rgba(94, 170, 181, 0.7)); /* 비닐에 청록색 그림자 효과 */
         }
         
         .vinyl-image {
@@ -88,6 +101,7 @@ body::before {
             pointer-events: none; /* 클릭 통과 */
             transform-origin: top left; /* 회전 원점을 왼쪽 상단으로 설정 */
             transition: transform 1s ease-in-out;
+            filter: drop-shadow(0 0 10px rgba(251, 170, 145, 0.7)); /* 톤암에 주황색 그림자 효과 */
         }
         
         .tonearm-image {
@@ -105,6 +119,7 @@ body::before {
             display: flex;
             width: 100%;
             min-height: 100vh;
+            height: 100%;
             position: relative;
         }
         
@@ -112,6 +127,7 @@ body::before {
         .right-section {
             width: 50%;
             min-height: 100vh;
+            height: 100%;
             margin-left: 50%;
             padding: 2rem;
             padding-bottom: 4rem;
@@ -128,8 +144,8 @@ body::before {
         /* Adjust left section when right is shrunk */
         .left-section {
             width: 50%;
-
             min-height: 100vh;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -147,7 +163,6 @@ body::before {
         }
         
         .left-content {
-
             padding: 2rem;
             border-radius: 1rem;
             text-align: center;
@@ -179,23 +194,24 @@ body::before {
         .shelf {
             width: 90%; /* Reduced from 100% */
             height: 90px; /* Reduced by 50% from 180px */
-            background-color: #343434; /* 기본 배경색 */
+            background-color: #F9ECD6; /* 페이스텔 배경색 */
             border-radius: 0.5rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(1, 64, 156, 0.2);
             display: flex;
             align-items: center;
             padding: 1rem;
             position: relative;
             margin: 0 auto; /* Center the shelf */
-            transition: transform 0.5s ease, box-shadow 0.5s ease; /* 명시적으로 애니메이션 속성 지정 */
+            transition: all 0.5s ease; /* 애니메이션 속성 */
             overflow: hidden; /* Ensure content stays within boundaries */
             cursor: pointer; /* Make the shelf clickable again */
             z-index: 45; /* 각 선반이 항상 클릭 가능하도록 */
             background-size: cover;
             background-position: center;
+            border: 2px solid rgba(252, 205, 160, 0.5);
         }
         
-        /* 이미지 위에 어두운 오버레이 추가 (텍스트 가독성 향상) */
+        /* 이미지 위에 반투명 오버레이 추가 (텍스트 가독성 향상) */
         .shelf::before {
             content: '';
             position: absolute;
@@ -203,13 +219,19 @@ body::before {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6); /* 어두운 오버레이 */
+            background: linear-gradient(to right, rgba(94, 170, 181, 0.7), rgba(1, 64, 156, 0.6)); /* 파스텔 그라데이션 */
             z-index: 1;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
         }
         
         .shelf:hover {
-            transform: translateY(-10px); /* Add hover effect to shelf */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            transform: translateY(-10px) scale(1.02); /* Add hover effect to shelf */
+            box-shadow: 0 8px 25px rgba(1, 64, 156, 0.4);
+        }
+        
+        .shelf:hover::before {
+            opacity: 0.6; /* 호버 시 오버레이 더 투명하게 */
         }
         
         .shelf::after {
@@ -219,7 +241,7 @@ body::before {
             left: 0;
             width: 100%;
             height: 10px;
-            background-color: #222222; /* Darker shadow for wood effect */
+            background-color: #FCCDA0; /* 선반 아래쪽 그림자 */
             border-radius: 0 0 5px 5px;
             z-index: -1;
         }
@@ -251,7 +273,7 @@ body::before {
         
         /* Album description */
         .album-description {
-            color: #bbbbbb;
+            color: #F9ECD6;
             font-size: 0.9rem;
             white-space: nowrap;
             overflow: hidden;
@@ -265,16 +287,16 @@ body::before {
         }
         
         .right-section::-webkit-scrollbar-track {
-            background: #1a1a1a;
+            background: rgba(249, 236, 214, 0.1);
         }
         
         .right-section::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(94, 170, 181, 0.4);
             border-radius: 5px;
         }
         
         .right-section::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(94, 170, 181, 0.6);
         }
         
         /* 오버레이 - vinyl을 더 잘 보이게 */
@@ -284,7 +306,10 @@ body::before {
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to right, 
+                rgba(249, 236, 214, 0.5), 
+                rgba(252, 205, 160, 0.5)
+            );
             z-index: 15; /* vinyl 아래, 다른 콘텐츠 위 */
             opacity: 0;
             pointer-events: none; /* 클릭 이벤트를 통과시켜 아래 요소에 전달 */
@@ -292,80 +317,211 @@ body::before {
         }
         
         .overlay.active {
-            opacity: 1;
+            opacity: 0.7;
         }
         
-        /* 재생 버튼 스타일 - 왼쪽 상단에 배치 */
-        .play-controls {
+        /* 왼쪽 패널 스타일 - 선반 클릭시 나타남 */
+        .side-panel {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
+            top: 0;
+            left: -15%; /* 처음에는 화면 밖에 위치 */
+            width: 15%; /* 화면의 15% 차지 */
+            height: 100vh; /* 화면 높이 100% */
+            background: linear-gradient(135deg, #F9ECD6, #5EAAB5);
+            color: #01409C;
+            z-index: 50;
+            box-shadow: 0 0 20px rgba(1, 64, 156, 0.3);
+            transition: left 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
         }
         
-        .play-btn {
-            background-color: #ff0000;
-            color: white;
+        .side-panel.active {
+            left: 0; /* 활성화되면 화면 왼쪽에 표시 */
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #01409C;
+        }
+        
+        .close-panel {
+            background: none;
             border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            color: #01409C;
             font-size: 20px;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+        
+        .close-panel:hover {
+            transform: scale(1.2);
+        }
+        
+        .album-cover {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            background-color: #FCCDA0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(1, 64, 156, 0.2);
+        }
+        
+        .album-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .album-info {
+            margin-bottom: 20px;
+        }
+        
+        .album-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #01409C;
+            margin-bottom: 5px;
+        }
+        
+        .album-artist {
+            font-size: 14px;
+            color: #5EAAB5;
+        }
+        
+        .play-button {
+            background: linear-gradient(145deg, #FBAA91, #01409C);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.3s ease;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(1, 64, 156, 0.3);
+            transition: all 0.3s ease;
         }
         
-        .play-btn:hover {
-            background-color: #cc0000;
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(1, 64, 156, 0.5);
         }
         
-        /* YouTube 플레이어 컨테이너 */
-        .youtube-container {
+        .play-icon {
+            margin-right: 8px;
+        }
+        
+        /* 파티클 애니메이션 */
+        .particles-container {
             position: fixed;
-            bottom: 0;
+            top: 0;
             left: 0;
             width: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px;
-            z-index: 1000;
-            display: none;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
         }
         
-        .youtube-container.active {
-            display: block;
-        }
-        
-        .youtube-player {
-            width: 1px;
-            height: 1px;
+        .particle {
             position: absolute;
-            opacity: 0.01;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+            animation: particleFade var(--duration, 5s) ease-in-out var(--delay, 0s) infinite;
         }
         
-        .now-playing {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
+        .particle.shape1 {
+            background-color: #F9ECD6;
+            box-shadow: 0 0 10px #F9ECD6;
         }
         
-        .song-info {
-            display: flex;
-            align-items: center;
+        .particle.shape2 {
+            background-color: #FCCDA0;
+            box-shadow: 0 0 12px #FCCDA0;
         }
         
-        .song-title {
-            font-weight: bold;
-            margin-right: 10px;
+        .particle.shape3 {
+            background-color: #FBAA91;
+            box-shadow: 0 0 15px #FBAA91;
         }
         
-        .song-artist {
-            color: #bbbbbb;
+        .particle.shape4 {
+            background-color: #5EAAB5;
+            box-shadow: 0 0 12px #5EAAB5;
+        }
+        
+        .particle.shape5 {
+            background-color: #01409C;
+            box-shadow: 0 0 10px #01409C;
+        }
+        
+        @keyframes particleFade {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5);
+            }
+            20% {
+                opacity: var(--max-opacity, 0.8);
+                transform: translateY(-20px) scale(1);
+            }
+            80% {
+                opacity: var(--max-opacity, 0.8);
+                transform: translateY(-80px) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-120px) scale(0.2);
+            }
+        }
+        
+        @keyframes particleFlow {
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+            100% {
+                transform: translateX(var(--move-x, 0px)) translateY(var(--move-y, 0px));
+            }
+        }
+        
+        /* 패턴 배경 */
+        .pattern-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(249, 236, 214, 0.3) 0%, rgba(249, 236, 214, 0) 50%),
+                radial-gradient(circle at 75% 75%, rgba(94, 170, 181, 0.3) 0%, rgba(94, 170, 181, 0) 50%),
+                radial-gradient(circle at 50% 50%, rgba(251, 170, 145, 0.2) 0%, rgba(251, 170, 145, 0) 70%);
+            z-index: -2;
+            animation: patternMove 20s ease infinite alternate;
+            background-size: 200% 200%;
+            pointer-events: none;
+        }
+        
+        @keyframes patternMove {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
         }
         
         /* Responsive design */
@@ -405,15 +561,9 @@ body::before {
                 font-size: 0.8rem;
             }
             
-            .play-controls {
-                top: 10px;
-                left: 10px;
-            }
-            
-            .play-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
+            .side-panel {
+                width: 70%;
+                left: -70%;
             }
         }
     </style>
@@ -422,9 +572,32 @@ body::before {
     <div class="container">
         <div class="overlay" id="overlay"></div>
         
-        <!-- 재생 버튼 추가 -->
-        <div class="play-controls">
-            <button class="play-btn" id="masterPlayBtn">▶</button>
+        <!-- 반짝이는 파티클 배경 추가 -->
+        <div class="particles-container" id="particlesContainer"></div>
+        
+        <!-- 패턴 배경 -->
+        <div class="pattern-background"></div>
+        
+        <!-- 왼쪽 패널 추가 -->
+        <div class="side-panel" id="sidePanel">
+            <div class="panel-header">
+                <div class="panel-title">Now Playing</div>
+                <button class="close-panel" id="closePanel">✖</button>
+            </div>
+            
+            <div class="album-cover">
+                <img id="panelAlbumCover" src="images/placeholder.jpg" alt="Album Cover">
+            </div>
+            
+            <div class="album-info">
+                <div class="album-name" id="panelAlbumName">Album Title</div>
+                <div class="album-artist" id="panelAlbumArtist">Artist Name</div>
+            </div>
+            
+            <button class="play-button" id="panelPlayButton">
+                <span class="play-icon">▶</span>
+                <span>Play</span>
+            </button>
         </div>
         
         <div class="vinyl-image-container" id="vinylContainer">
@@ -446,18 +619,6 @@ body::before {
                 <!-- Shelves will be dynamically generated here -->
             </div>
         </section>
-        
-        <!-- YouTube 플레이어 컨테이너 추가 -->
-        <div class="youtube-container" id="youtubeContainer">
-            <div class="now-playing">
-                <div class="song-info">
-                    <div class="song-title" id="currentSongTitle">노래 제목</div>
-                    <div class="song-artist" id="currentArtist">아티스트</div>
-                </div>
-                <button id="closePlayer" style="background: none; border: none; color: white; cursor: pointer;">✖</button>
-            </div>
-            <div id="youtubePlayerContainer"></div>
-        </div>
     </div>
     
     <!-- YouTube API 추가 -->
@@ -474,12 +635,14 @@ body::before {
             const vinylImage = document.getElementById('vinylImage');
             const overlay = document.getElementById('overlay');
             const tonearmContainer = document.getElementById('tonearmContainer');
-            const masterPlayBtn = document.getElementById('masterPlayBtn');
-            const youtubeContainer = document.getElementById('youtubeContainer');
-            const youtubePlayerContainer = document.getElementById('youtubePlayerContainer');
-            const currentSongTitle = document.getElementById('currentSongTitle');
-            const currentArtist = document.getElementById('currentArtist');
-            const closePlayer = document.getElementById('closePlayer');
+            
+            // 사이드 패널 요소
+            const sidePanel = document.getElementById('sidePanel');
+            const closePanel = document.getElementById('closePanel');
+            const panelAlbumCover = document.getElementById('panelAlbumCover');
+            const panelAlbumName = document.getElementById('panelAlbumName');
+            const panelAlbumArtist = document.getElementById('panelAlbumArtist');
+            const panelPlayButton = document.getElementById('panelPlayButton');
             
             let isRightSectionShrunk = false;
             let isVinylAnimating = false;
@@ -506,16 +669,17 @@ body::before {
             ];
             
             // YouTube 플레이어 API 초기화
-            // 이 함수는 YouTube IFrame API가 로드된 후 자동으로 호출됩니다
             window.onYouTubeIframeAPIReady = function() {
                 console.log("YouTube API Ready");
                 
                 // 플레이어 div 생성
-                if (!document.getElementById('youtube-player')) {
-                    const playerDiv = document.createElement('div');
-                    playerDiv.id = 'youtube-player';
-                    youtubePlayerContainer.appendChild(playerDiv);
-                }
+                const playerDiv = document.createElement('div');
+                playerDiv.id = 'youtube-player';
+                playerDiv.style.position = 'absolute';
+                playerDiv.style.opacity = '0.01';
+                playerDiv.style.width = '1px';
+                playerDiv.style.height = '1px';
+                document.body.appendChild(playerDiv);
                 
                 // YouTube 플레이어 생성
                 player = new YT.Player('youtube-player', {
@@ -545,10 +709,19 @@ body::before {
                 // 0: 종료, 1: 재생 중, 2: 일시 정지
                 if (event.data === YT.PlayerState.PLAYING) {
                     isPlaying = true;
-                    masterPlayBtn.innerHTML = '❚❚'; // 일시정지 아이콘
+                    updatePlayButtonState(true);
                 } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
                     isPlaying = false;
-                    masterPlayBtn.innerHTML = '▶'; // 재생 아이콘
+                    updatePlayButtonState(false);
+                }
+            }
+            
+            // 재생 버튼 상태 업데이트
+            function updatePlayButtonState(playing) {
+                if (playing) {
+                    panelPlayButton.innerHTML = '<span class="play-icon">❚❚</span><span>Pause</span>';
+                } else {
+                    panelPlayButton.innerHTML = '<span class="play-icon">▶</span><span>Play</span>';
                 }
             }
             
@@ -558,8 +731,7 @@ body::before {
                     currentYoutubeId = youtubeId;
                     player.loadVideoById(youtubeId);
                     isPlaying = true;
-                    masterPlayBtn.innerHTML = '❚❚'; // 일시정지 아이콘
-                    youtubeContainer.classList.add('active'); // 플레이어 표시
+                    updatePlayButtonState(true);
                 } else {
                     console.log("플레이어가 준비되지 않았습니다. 잠시 후 다시 시도합니다.");
                     // API가 아직 준비되지 않은 경우 잠시 후 다시 시도
@@ -568,8 +740,7 @@ body::before {
                             currentYoutubeId = youtubeId;
                             player.loadVideoById(youtubeId);
                             isPlaying = true;
-                            masterPlayBtn.innerHTML = '❚❚';
-                            youtubeContainer.classList.add('active');
+                            updatePlayButtonState(true);
                         } else {
                             console.error("YouTube 플레이어를 초기화할 수 없습니다.");
                             // 대체 방식으로 iframe 직접 생성
@@ -597,50 +768,47 @@ body::before {
                 iframe.allow = 'autoplay';
                 iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1`;
                 
-                youtubePlayerContainer.appendChild(iframe);
+                document.body.appendChild(iframe);
                 
                 currentYoutubeId = youtubeId;
                 isPlaying = true;
-                masterPlayBtn.innerHTML = '❚❚'; // 일시정지 아이콘으로 변경
-                youtubeContainer.classList.add('active'); // 플레이어 표시
+                updatePlayButtonState(true);
             }
             
-            // 마스터 재생/일시정지 버튼 이벤트
-            masterPlayBtn.addEventListener('click', function() {
-                if (player && currentYoutubeId) {
-                    if (isPlaying) {
-                        // 일시정지
+            // 패널 내 재생/일시정지 버튼 이벤트
+            panelPlayButton.addEventListener('click', function() {
+                if (!currentYoutubeId) return;
+                
+                if (isPlaying) {
+                    // 일시정지
+                    if (player) {
                         player.pauseVideo();
-                        isPlaying = false;
-                        masterPlayBtn.innerHTML = '▶'; // 재생 아이콘
                     } else {
-                        // 재생
-                        player.playVideo();
-                        isPlaying = true;
-                        masterPlayBtn.innerHTML = '❚❚'; // 일시정지 아이콘
+                        const iframe = document.getElementById('youtube-iframe');
+                        if (iframe) {
+                            iframe.src = '';
+                        }
                     }
-                } else if (currentYoutubeId) {
-                    // API 사용 불가능한 경우 대체 방식 사용
-                    createYoutubeIframe(currentYoutubeId);
-                }
-            });
-            
-            // 플레이어 닫기 버튼
-            closePlayer.addEventListener('click', function() {
-                youtubeContainer.classList.remove('active');
-                if (player) {
-                    player.stopVideo();
+                    isPlaying = false;
+                    updatePlayButtonState(false);
                 } else {
-                    const iframe = document.getElementById('youtube-iframe');
-                    if (iframe) {
-                        iframe.src = '';
+                    // 재생
+                    if (player) {
+                        player.playVideo();
+                    } else {
+                        createYoutubeIframe(currentYoutubeId);
                     }
+                    isPlaying = true;
+                    updatePlayButtonState(true);
                 }
-                isPlaying = false;
-                masterPlayBtn.innerHTML = '▶'; // 재생 아이콘
             });
             
-            // 선반 클릭 처리 함수 - YouTube 연동 추가
+            // 패널 닫기 버튼 클릭 이벤트
+            closePanel.addEventListener('click', function() {
+                sidePanel.classList.remove('active');
+            });
+            
+            // 선반 클릭 이벤트 - 메인 기능
             function toggleSectionAndRotateVinyl(e) {
                 e.stopPropagation();
                 
@@ -652,18 +820,22 @@ body::before {
                 const shelfIndex = Array.from(shelvesContainer.children).indexOf(this);
                 const albumData = albums[shelfIndex];
                 
-                // YouTube ID 저장 및 현재 재생 정보 업데이트
-                if (albumData) {
-                    currentSongTitle.textContent = albumData.title;
-                    currentArtist.textContent = albumData.description;
-                    currentYoutubeId = albumData.youtubeId;
+                if (!albumData) {
+                    isVinylAnimating = false;
+                    return;
                 }
+                
+                // 현재 앨범 정보 업데이트
+                currentYoutubeId = albumData.youtubeId;
                 
                 console.log("선반 클릭됨: 상태 토글", isRightSectionShrunk ? "확장" : "축소");
 
-                // 1. 현재 상태에 따라 다른 동작 수행
+                // 현재 상태에 따라 다른 동작 수행
                 if (isRightSectionShrunk) {
                     // 확장 시 (25% -> 50%)
+                    
+                    // 사이드 패널 감추기
+                    sidePanel.classList.remove('active');
                     
                     // 먼저 톤암을 원래 위치로
                     tonearmContainer.classList.remove('play');
@@ -692,7 +864,7 @@ body::before {
                     
                     // YouTube 재생 중지
                     if (player) {
-                        player.stopVideo();
+                        player.pauseVideo(); // 일시정지만 하고 완전히 중지하지 않음
                     } else {
                         const iframe = document.getElementById('youtube-iframe');
                         if (iframe) {
@@ -700,7 +872,7 @@ body::before {
                         }
                     }
                     isPlaying = false;
-                    masterPlayBtn.innerHTML = '▶';
+                    updatePlayButtonState(false);
                     
                 } else {
                     // 축소 시 (50% -> 25%)
@@ -736,6 +908,33 @@ body::before {
                 
                 // 상태 토글
                 isRightSectionShrunk = !isRightSectionShrunk;
+            }
+            
+            // 선반 우클릭 이벤트 - 사이드 패널 열기
+            function handleShelfRightClick(e) {
+                e.preventDefault(); // 기본 컨텍스트 메뉴 방지
+                
+                // 선반에서 앨범 데이터 가져오기
+                const shelfIndex = Array.from(shelvesContainer.children).indexOf(this);
+                const albumData = albums[shelfIndex];
+                
+                if (!albumData) return;
+                
+                // 앨범 정보를 패널에 업데이트
+                panelAlbumName.textContent = albumData.title;
+                panelAlbumArtist.textContent = albumData.description;
+                if (panelAlbumCover) {
+                    panelAlbumCover.src = albumData.image || 'images/placeholder.jpg';
+                }
+                
+                // 현재 YouTube ID 저장
+                currentYoutubeId = albumData.youtubeId;
+                
+                // 재생 버튼 상태 업데이트
+                updatePlayButtonState(isPlaying);
+                
+                // 사이드 패널 표시
+                sidePanel.classList.add('active');
             }
             
             // Generate shelves with album data
@@ -781,9 +980,38 @@ body::before {
                 // 클릭 이벤트
                 shelf.addEventListener('click', toggleSectionAndRotateVinyl);
                 
+                // 우클릭 이벤트
+                shelf.addEventListener('contextmenu', handleShelfRightClick);
+                
                 // 선반 추가
                 shelvesContainer.appendChild(shelf);
             }
+            
+            // 선반 클릭 시 사이드 패널 열기 (작은 화면에서는 선반이 25%일 때)
+            function handleShelfClick() {
+                if (isRightSectionShrunk) {
+                    const shelfIndex = Array.from(shelvesContainer.children).indexOf(this);
+                    const albumData = albums[shelfIndex];
+                    
+                    if (!albumData) return;
+                    
+                    // 앨범 정보를 패널에 업데이트
+                    panelAlbumName.textContent = albumData.title;
+                    panelAlbumArtist.textContent = albumData.description;
+                    if (panelAlbumCover) {
+                        panelAlbumCover.src = albumData.image || 'images/placeholder.jpg';
+                    }
+                    
+                    // 사이드 패널 표시
+                    sidePanel.classList.add('active');
+                }
+            }
+            
+            // 모든 선반에 클릭 이벤트 추가
+            const allShelves = document.querySelectorAll('.shelf');
+            allShelves.forEach(shelf => {
+                shelf.addEventListener('click', handleShelfClick);
+            });
             
             // Calculate the height to display approximately 7 shelves
             function setInitialScroll() {
@@ -804,8 +1032,80 @@ body::before {
                 }
             }
             
-            // Call initially and on window resize
+            // 반짝이는 파티클 배경 생성
+            function createSparklingBackground() {
+                const particlesContainer = document.getElementById('particlesContainer');
+                const numberOfParticles = 150; // 파티클의 수 조정
+                
+                const colors = [
+                    '#F9ECD6', // Pastel peach
+                    '#FCCDA0', // Pastel orange
+                    '#FBAA91', // Pastel red-orange
+                    '#5EAAB5', // Teal
+                    '#01409C'  // Dark blue
+                ];
+                
+                for (let i = 0; i < numberOfParticles; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle shape' + (Math.floor(Math.random() * 5) + 1);
+                    
+                    // 무작위 위치 (화면 하단부에서 시작)
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 20 + 80; // 하단 20% 영역에서 시작
+                    particle.style.left = `${x}%`;
+                    particle.style.top = `${y}%`;
+                    
+                    // 무작위 크기 (파스텔 색상에 맞게 좀 더 크게)
+                    const size = Math.random() * 8 + 2;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // 무작위 애니메이션 속도와 지연
+                    const duration = Math.random() * 8 + 5;
+                    const delay = Math.random() * 5;
+                    particle.style.setProperty('--duration', `${duration}s`);
+                    particle.style.setProperty('--delay', `${delay}s`);
+                    particle.style.setProperty('--max-opacity', `${Math.random() * 0.5 + 0.3}`);
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+            
+            // 마우스 움직임에 따라 파티클이 움직이는 효과
+            function addParticleInteractivity() {
+                const particles = document.querySelectorAll('.particle');
+                
+                document.addEventListener('mousemove', (e) => {
+                    const mouseX = e.clientX;
+                    const mouseY = e.clientY;
+                    
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    
+                    const moveX = (mouseX - centerX) / 40; // 감도 조절
+                    const moveY = (mouseY - centerY) / 40;
+                    
+                    particles.forEach(particle => {
+                        const size = parseFloat(particle.style.width);
+                        const sensitivity = (10 - size) / 2; // 작은 파티클이 더 민감하게
+                        
+                        particle.style.setProperty('--move-x', `${moveX * sensitivity}px`);
+                        particle.style.setProperty('--move-y', `${moveY * sensitivity}px`);
+                        
+                        particle.style.animation = `
+                            particleFade var(--duration) ease-in-out var(--delay) infinite,
+                            particleFlow 3s ease-out forwards
+                        `;
+                    });
+                });
+            }
+            
+            // 초기화 함수 호출
             setInitialScroll();
+            createSparklingBackground();
+            addParticleInteractivity();
+            
+            // 창 크기 변경 시 재계산
             window.addEventListener('resize', setInitialScroll);
         });
     </script>
