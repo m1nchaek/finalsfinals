@@ -1,0 +1,813 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page with Shelves</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+     body {
+
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/vinyl-texture.jpg');
+    background-size: cover;
+    background-blend-mode: overlay;
+    opacity: 0.3; /* 투명도 조절 */
+    z-index: -1; /* 내용물 뒤에 배치 */
+}
+        
+        /* vinyl 이미지 컨테이너 스타일 */
+        .vinyl-image-container {
+            position: fixed; /* fixed로 위치 고정 */
+            top: 50%; /* 세로 중앙 */
+            left: -500px; /* 초기 왼쪽 위치 - 화면 밖 */
+            transform: translateY(-50%); /* 세로 중앙 정렬 (가로 이동 없음) */
+            z-index: 20; /* 가장 위에 표시되도록 증가 */
+            pointer-events: none; /* 클릭 통과 - 중요! */
+            width: 1000px; /* 이미지 크기 */
+            height: 1000px;
+            transition: left 0.8s ease-in-out; /* 가로 이동만 애니메이션 */
+        }
+        
+        .vinyl-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 1.5s ease-in-out;
+            pointer-events: none; /* 클릭 통과 - 중요! */
+        }
+        
+        /* 중앙으로 이동하는 클래스 - left만 변경 */
+        .vinyl-image-container.roll-center {
+            left: 50%; /* 화면 중앙으로 이동 (가로 기준) */
+            transform: translate(-50%, -50%); /* 수평, 수직 모두 중앙 정렬 */
+        }
+        
+        /* 회전 애니메이션 클래스 - 1회 회전 */
+        .vinyl-image.spin {
+            transform: rotate(360deg); /* 360도 회전 */
+        }
+        
+        /* 계속 회전하는 애니메이션 */
+        @keyframes continuous-spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* 계속 회전하는 클래스 */
+        .vinyl-image.continuous-spin {
+            animation: continuous-spin 3s linear infinite; /* 3초마다 360도 회전, 무한 반복 */
+        }
+        
+        /* 톤암 이미지 스타일 */
+        .tonearm-container {
+            position: fixed;
+            top: 13%; /* 상단에서 30% 위치 */
+            left: 10%; /* 왼쪽에서 10% 위치 */
+            width: 500px; /* 크기 조정 */
+            height: 500px;
+            z-index: 25; /* vinyl 위에 표시 */
+            pointer-events: none; /* 클릭 통과 */
+            transform-origin: top left; /* 회전 원점을 왼쪽 상단으로 설정 */
+            transition: transform 1s ease-in-out;
+        }
+        
+        .tonearm-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* vinyl이 중앙에 있을 때 톤암 회전 */
+        .tonearm-container.play {
+            transform: rotate(-25deg); /* 톤암이 vinyl 위에 올라간 효과 */
+        }
+        
+        .container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Add styles for the shrunk right section */
+        .right-section {
+            width: 50%;
+            min-height: 100vh;
+            margin-left: 50%;
+            padding: 2rem;
+            padding-bottom: 4rem;
+            transition: width 0.5s ease, margin-left 0.5s ease; /* 명시적으로 애니메이션 속성 지정 */
+            z-index: 40; /* shelves가 항상 최상단에 있도록 z-index 증가 */
+            position: relative; /* z-index 적용을 위해 */
+        }
+        
+        .right-section.shrunk {
+            width: 25%;
+            margin-left: 75%;
+        }
+        
+        /* Adjust left section when right is shrunk */
+        .left-section {
+            width: 50%;
+
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            left: 0;
+            padding: 2rem;
+            color: white;
+            transition: width 0.5s ease; /* 명시적으로 width만 애니메이션 */
+            z-index: 5; /* 왼쪽 섹션은 가장 낮은 층으로 */
+        }
+        
+        .left-section.expanded {
+            width: 75%;
+        }
+        
+        .left-content {
+
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            max-width: 80%;
+            backdrop-filter: blur(3px); /* Adds a slight blur effect behind the content */
+            z-index: 6;
+        }
+        
+        .left-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .left-content p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .shelves-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            position: relative; /* 위치 컨텍스트 제공 */
+            z-index: 42; /* shelves 내용물이 항상 최상단에 위치하도록 */
+        }
+        
+        /* 선반 스타일 업데이트 - 이미지를 배경으로 사용 */
+        .shelf {
+            width: 90%; /* Reduced from 100% */
+            height: 90px; /* Reduced by 50% from 180px */
+            background-color: #343434; /* 기본 배경색 */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            position: relative;
+            margin: 0 auto; /* Center the shelf */
+            transition: transform 0.5s ease, box-shadow 0.5s ease; /* 명시적으로 애니메이션 속성 지정 */
+            overflow: hidden; /* Ensure content stays within boundaries */
+            cursor: pointer; /* Make the shelf clickable again */
+            z-index: 45; /* 각 선반이 항상 클릭 가능하도록 */
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* 이미지 위에 어두운 오버레이 추가 (텍스트 가독성 향상) */
+        .shelf::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* 어두운 오버레이 */
+            z-index: 1;
+        }
+        
+        .shelf:hover {
+            transform: translateY(-10px); /* Add hover effect to shelf */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .shelf::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background-color: #222222; /* Darker shadow for wood effect */
+            border-radius: 0 0 5px 5px;
+            z-index: -1;
+        }
+        
+        /* 선반 내용 스타일 */
+        .shelf-content {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            z-index: 2; /* 배경 이미지 및 오버레이 위에 표시 */
+        }
+        
+        /* 선반 텍스트 컨테이너 */
+        .shelf-text {
+            flex: 1;
+        }
+        
+        /* Album title label */
+        .album-title {
+            position: relative;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Album description */
+        .album-description {
+            color: #bbbbbb;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        
+        /* Remove the vinyl shelves scrollbar since we don't need horizontal scrolling */
+        .right-section::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .right-section::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        .right-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+        
+        .right-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        
+        /* 오버레이 - vinyl을 더 잘 보이게 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 15; /* vinyl 아래, 다른 콘텐츠 위 */
+            opacity: 0;
+            pointer-events: none; /* 클릭 이벤트를 통과시켜 아래 요소에 전달 */
+            transition: opacity 0.5s ease;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+        }
+        
+        /* 재생 버튼 스타일 - 왼쪽 상단에 배치 */
+        .play-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+        
+        .play-btn {
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .play-btn:hover {
+            background-color: #cc0000;
+        }
+        
+        /* YouTube 플레이어 컨테이너 */
+        .youtube-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .youtube-container.active {
+            display: block;
+        }
+        
+        .youtube-player {
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            opacity: 0.01;
+        }
+        
+        .now-playing {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        
+        .song-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .song-title {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .song-artist {
+            color: #bbbbbb;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .left-section {
+                width: 100%;
+                position: relative;
+                min-height: 50vh;
+            }
+            
+            .right-section {
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            .vinyl-image-container {
+                width: 600px;
+                height: 600px;
+            }
+            
+            .tonearm-container {
+                width: 150px;
+                height: 200px;
+                top: 20%;
+                left: 5%;
+            }
+            
+            .album-title {
+                font-size: 1rem;
+            }
+            
+            .album-description {
+                font-size: 0.8rem;
+            }
+            
+            .play-controls {
+                top: 10px;
+                left: 10px;
+            }
+            
+            .play-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="overlay" id="overlay"></div>
+        
+        <!-- 재생 버튼 추가 -->
+        <div class="play-controls">
+            <button class="play-btn" id="masterPlayBtn">▶</button>
+        </div>
+        
+        <div class="vinyl-image-container" id="vinylContainer">
+            <img src="images/vinyl.png" alt="Vinyl Record" class="vinyl-image" id="vinylImage">
+        </div>
+        
+        <div class="tonearm-container" id="tonearmContainer">
+            <img src="images/tonearm.png" alt="Tone Arm" class="tonearm-image" id="tonearmImage">
+        </div>
+        
+        <section class="left-section">
+            <div class="left-content">
+                <!-- 왼쪽 콘텐츠 -->
+            </div>
+        </section>
+        
+        <section class="right-section">
+            <div class="shelves-container" id="shelves">
+                <!-- Shelves will be dynamically generated here -->
+            </div>
+        </section>
+        
+        <!-- YouTube 플레이어 컨테이너 추가 -->
+        <div class="youtube-container" id="youtubeContainer">
+            <div class="now-playing">
+                <div class="song-info">
+                    <div class="song-title" id="currentSongTitle">노래 제목</div>
+                    <div class="song-artist" id="currentArtist">아티스트</div>
+                </div>
+                <button id="closePlayer" style="background: none; border: none; color: white; cursor: pointer;">✖</button>
+            </div>
+            <div id="youtubePlayerContainer"></div>
+        </div>
+    </div>
+    
+    <!-- YouTube API 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const shelvesContainer = document.getElementById('shelves');
+            const rightSection = document.querySelector('.right-section');
+            const leftSection = document.querySelector('.left-section');
+            const vinylContainer = document.getElementById('vinylContainer');
+            const vinylImage = document.getElementById('vinylImage');
+            const overlay = document.getElementById('overlay');
+            const tonearmContainer = document.getElementById('tonearmContainer');
+            const masterPlayBtn = document.getElementById('masterPlayBtn');
+            const youtubeContainer = document.getElementById('youtubeContainer');
+            const youtubePlayerContainer = document.getElementById('youtubePlayerContainer');
+            const currentSongTitle = document.getElementById('currentSongTitle');
+            const currentArtist = document.getElementById('currentArtist');
+            const closePlayer = document.getElementById('closePlayer');
+            
+            let isRightSectionShrunk = false;
+            let isVinylAnimating = false;
+            let currentYoutubeId = null;
+            let isPlaying = false;
+            
+            // 앨범 데이터 샘플 - YouTube ID 추가
+            const albums = [
+                { title: "'The Dark Side of the Moon'", description: "Pink Floyd", image: "images/1.png", youtubeId: "KrfhWmHxKQI" },
+                { title: "'Faces'", description: "Mac Miller", image: "images/2.jpg", youtubeId: "vwF5SknRJuU" },
+                { title: "'Oasis'", description: "Darius", image: "images/3.jpg", youtubeId: "L29pzqfQtDc" },
+                { title: "'Rufus featuring Chaka Khan'", description: "Rufus", image: "images/4.jpg", youtubeId: "5r99QsAdS9s" },
+                { title: "'AM'", description: "Arctic Monkey", image: "images/5.jpg", youtubeId: "ma9I9VBKPiw" },
+                { title: "'Team Baby'", description: "The Blackskirts", image: "images/6.png", youtubeId: "YyT4FYVRy_o" },
+                { title: "'Being so Normal'", description: "Peachpit", image: "images/7.jpg", youtubeId: "QJGhHtnGBCM" },
+                { title: "'Lianne La Havas'", description: "Lianne La Havas", image: "images/8.jpg", youtubeId: "tZ_CQv9n13U" },
+                { title: "'Good Kid, M.A.A.D City'", description: "Kendrick Lamar", image: "images/9.jpg", youtubeId: "8-ejyHzz3XE" },
+                { title: "'Blonde'", description: "Frank Ocean", image: "images/10.jpg", youtubeId: "diIFhc_Kzng" },
+                { title: "'Dawn FM'", description: "The Weekend", image: "images/11.jpg", youtubeId: "JH398xAYpZA" },
+                { title: "'Heavier things'", description: "John Mayer", image: "images/12.jpg", youtubeId: "YfLkO3uwBlQ" },
+                { title: "'In Rainbows'", description: "Radiohead", image: "images/13.jpg", youtubeId: "DV1KCZowBQo" },
+                { title: "'Heart of Mine'", description: "Bobby Caldwell", image: "images/14.jpg", youtubeId: "3qZA1UGt3cE" },
+                { title: "'Nevermind'", description: "Nirvana", image: "images/15.jpg", youtubeId: "hTWKbfoikeg" }
+            ];
+            
+            // YouTube 플레이어 API 초기화
+            // 이 함수는 YouTube IFrame API가 로드된 후 자동으로 호출됩니다
+            window.onYouTubeIframeAPIReady = function() {
+                console.log("YouTube API Ready");
+                
+                // 플레이어 div 생성
+                if (!document.getElementById('youtube-player')) {
+                    const playerDiv = document.createElement('div');
+                    playerDiv.id = 'youtube-player';
+                    youtubePlayerContainer.appendChild(playerDiv);
+                }
+                
+                // YouTube 플레이어 생성
+                player = new YT.Player('youtube-player', {
+                    height: '1',
+                    width: '1',
+                    playerVars: {
+                        'autoplay': 0,
+                        'controls': 0,
+                        'showinfo': 0,
+                        'rel': 0,
+                        'iv_load_policy': 3
+                    },
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            };
+            
+            // 플레이어 준비 완료 시
+            function onPlayerReady(event) {
+                console.log("Player Ready");
+            }
+            
+            // 플레이어 상태 변경 시
+            function onPlayerStateChange(event) {
+                // 0: 종료, 1: 재생 중, 2: 일시 정지
+                if (event.data === YT.PlayerState.PLAYING) {
+                    isPlaying = true;
+                    masterPlayBtn.innerHTML = '❚❚'; // 일시정지 아이콘
+                } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                    isPlaying = false;
+                    masterPlayBtn.innerHTML = '▶'; // 재생 아이콘
+                }
+            }
+            
+            // YouTube 재생 함수
+            function playYouTube(youtubeId) {
+                if (player && player.loadVideoById) {
+                    currentYoutubeId = youtubeId;
+                    player.loadVideoById(youtubeId);
+                    isPlaying = true;
+                    masterPlayBtn.innerHTML = '❚❚'; // 일시정지 아이콘
+                    youtubeContainer.classList.add('active'); // 플레이어 표시
+                } else {
+                    console.log("플레이어가 준비되지 않았습니다. 잠시 후 다시 시도합니다.");
+                    // API가 아직 준비되지 않은 경우 잠시 후 다시 시도
+                    setTimeout(function() {
+                        if (player && player.loadVideoById) {
+                            currentYoutubeId = youtubeId;
+                            player.loadVideoById(youtubeId);
+                            isPlaying = true;
+                            masterPlayBtn.innerHTML = '❚❚';
+                            youtubeContainer.classList.add('active');
+                        } else {
+                            console.error("YouTube 플레이어를 초기화할 수 없습니다.");
+                            // 대체 방식으로 iframe 직접 생성
+                            createYoutubeIframe(youtubeId);
+                        }
+                    }, 1000);
+                }
+            }
+            
+            // 대체 방식: iframe 직접 생성
+            function createYoutubeIframe(youtubeId) {
+                // 기존 iframe 제거
+                const existingIframe = document.getElementById('youtube-iframe');
+                if (existingIframe) {
+                    existingIframe.remove();
+                }
+                
+                // 새 iframe 생성
+                const iframe = document.createElement('iframe');
+                iframe.id = 'youtube-iframe';
+                iframe.width = '1';
+                iframe.height = '1';
+                iframe.style.position = 'absolute';
+                iframe.style.opacity = '0.01';
+                iframe.allow = 'autoplay';
+                iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1`;
+                
+                youtubePlayerContainer.appendChild(iframe);
+                
+                currentYoutubeId = youtubeId;
+                isPlaying = true;
+                masterPlayBtn.innerHTML = '❚❚'; // 일시정지 아이콘으로 변경
+                youtubeContainer.classList.add('active'); // 플레이어 표시
+            }
+            
+            // 마스터 재생/일시정지 버튼 이벤트
+            masterPlayBtn.addEventListener('click', function() {
+                if (player && currentYoutubeId) {
+                    if (isPlaying) {
+                        // 일시정지
+                        player.pauseVideo();
+                        isPlaying = false;
+                        masterPlayBtn.innerHTML = '▶'; // 재생 아이콘
+                    } else {
+                        // 재생
+                        player.playVideo();
+                        isPlaying = true;
+                        masterPlayBtn.innerHTML = '❚❚'; // 일시정지 아이콘
+                    }
+                } else if (currentYoutubeId) {
+                    // API 사용 불가능한 경우 대체 방식 사용
+                    createYoutubeIframe(currentYoutubeId);
+                }
+            });
+            
+            // 플레이어 닫기 버튼
+            closePlayer.addEventListener('click', function() {
+                youtubeContainer.classList.remove('active');
+                if (player) {
+                    player.stopVideo();
+                } else {
+                    const iframe = document.getElementById('youtube-iframe');
+                    if (iframe) {
+                        iframe.src = '';
+                    }
+                }
+                isPlaying = false;
+                masterPlayBtn.innerHTML = '▶'; // 재생 아이콘
+            });
+            
+            // 선반 클릭 처리 함수 - YouTube 연동 추가
+            function toggleSectionAndRotateVinyl(e) {
+                e.stopPropagation();
+                
+                // 애니메이션 중인 경우 무시
+                if (isVinylAnimating) return;
+                isVinylAnimating = true;
+                
+                // 선반에서 앨범 데이터 가져오기
+                const shelfIndex = Array.from(shelvesContainer.children).indexOf(this);
+                const albumData = albums[shelfIndex];
+                
+                // YouTube ID 저장 및 현재 재생 정보 업데이트
+                if (albumData) {
+                    currentSongTitle.textContent = albumData.title;
+                    currentArtist.textContent = albumData.description;
+                    currentYoutubeId = albumData.youtubeId;
+                }
+                
+                console.log("선반 클릭됨: 상태 토글", isRightSectionShrunk ? "확장" : "축소");
+
+                // 1. 현재 상태에 따라 다른 동작 수행
+                if (isRightSectionShrunk) {
+                    // 확장 시 (25% -> 50%)
+                    
+                    // 먼저 톤암을 원래 위치로
+                    tonearmContainer.classList.remove('play');
+                    
+                    // 계속 회전 중지
+                    vinylImage.classList.remove('continuous-spin');
+                    
+                    // 약간의 지연 후 vinyl을 원래 위치로 이동시키며 1회 회전
+                    setTimeout(function() {
+                        vinylContainer.classList.remove('roll-center');
+                        vinylImage.classList.add('spin');
+                        overlay.classList.remove('active');
+                        
+                        // vinyl이 충분히 이동한 후에 섹션 확장
+                        setTimeout(function() {
+                            rightSection.classList.remove('shrunk');
+                            leftSection.classList.remove('expanded');
+                            
+                            // 애니메이션 완료 후 초기화
+                            setTimeout(function() {
+                                vinylImage.classList.remove('spin');
+                                isVinylAnimating = false;
+                            }, 1000);
+                        }, 800); // vinyl이 충분히 이동한 후에 실행
+                    }, 300); // 톤암 애니메이션이 시작된 후 vinyl 이동
+                    
+                    // YouTube 재생 중지
+                    if (player) {
+                        player.stopVideo();
+                    } else {
+                        const iframe = document.getElementById('youtube-iframe');
+                        if (iframe) {
+                            iframe.src = '';
+                        }
+                    }
+                    isPlaying = false;
+                    masterPlayBtn.innerHTML = '▶';
+                    
+                } else {
+                    // 축소 시 (50% -> 25%)
+                    // 먼저 vinyl 이동 시작 (1회 회전)
+                    vinylContainer.classList.add('roll-center');
+                    vinylImage.classList.add('spin');
+                    overlay.classList.add('active');
+                    
+                    // vinyl이 중앙으로 이동하기 시작한 직후 섹션 축소
+                    setTimeout(function() {
+                        rightSection.classList.add('shrunk');
+                        leftSection.classList.add('expanded');
+                        
+                        // vinyl이 중앙에 도달하면 톤암 이동
+                        setTimeout(function() {
+                            tonearmContainer.classList.add('play');
+                            
+                            // 1회 회전이 끝나면 계속 회전으로 변경
+                            setTimeout(function() {
+                                vinylImage.classList.remove('spin');
+                                vinylImage.classList.add('continuous-spin');
+                                isVinylAnimating = false;
+                                
+                                // YouTube 재생 시작
+                                if (currentYoutubeId) {
+                                    playYouTube(currentYoutubeId);
+                                }
+                                
+                            }, 1000);
+                        }, 600); // vinyl이 중앙에 도달한 후 톤암 이동
+                    }, 200); // vinyl 이동 시작 직후 섹션 축소
+                }
+                
+                // 상태 토글
+                isRightSectionShrunk = !isRightSectionShrunk;
+            }
+            
+            // Generate shelves with album data
+            for (let i = 0; i < albums.length; i++) {
+                const album = albums[i];
+                
+                // 선반 요소 생성
+                const shelf = document.createElement('div');
+                shelf.className = 'shelf';
+                // 이미지를 배경으로 설정
+                shelf.style.backgroundImage = `url('${album.image}')`;
+                
+                // 이미지 로딩 오류 시 기본 배경색 사용
+                const img = new Image();
+                img.onerror = function() {
+                    shelf.style.backgroundImage = 'none';
+                };
+                img.src = album.image;
+                
+                // 선반 내용 생성
+                const shelfContent = document.createElement('div');
+                shelfContent.className = 'shelf-content';
+                
+                // 텍스트 컨테이너
+                const textContainer = document.createElement('div');
+                textContainer.className = 'shelf-text';
+                
+                // 앨범 제목
+                const albumTitle = document.createElement('div');
+                albumTitle.className = 'album-title';
+                albumTitle.textContent = album.title;
+                textContainer.appendChild(albumTitle);
+                
+                // 앨범 설명
+                const albumDescription = document.createElement('div');
+                albumDescription.className = 'album-description';
+                albumDescription.textContent = album.description;
+                textContainer.appendChild(albumDescription);
+                
+                shelfContent.appendChild(textContainer);
+                shelf.appendChild(shelfContent);
+                
+                // 클릭 이벤트
+                shelf.addEventListener('click', toggleSectionAndRotateVinyl);
+                
+                // 선반 추가
+                shelvesContainer.appendChild(shelf);
+            }
+            
+            // Calculate the height to display approximately 7 shelves
+            function setInitialScroll() {
+                const shelfHeight = 90; // Height of each shelf (reduced by 50%)
+                const gap = 32; // Gap between shelves (2rem = 32px typically)
+                
+                // Calculate viewport height excluding the padding (2rem top and bottom = 64px)
+                const viewportHeight = window.innerHeight - 64;
+                
+                // Calculate how many shelves fit in the viewport (7 shelves ideally)
+                const visibleShelves = Math.min(7, Math.floor(viewportHeight / (shelfHeight + gap)));
+                
+                // Scroll to show just the first X shelves
+                if (visibleShelves < albums.length) {
+                    // No need to set scroll if all shelves fit
+                    rightSection.style.maxHeight = `${visibleShelves * (shelfHeight + gap)}px`;
+                    rightSection.style.overflowY = 'auto';
+                }
+            }
+            
+            // Call initially and on window resize
+            setInitialScroll();
+            window.addEventListener('resize', setInitialScroll);
+        });
+    </script>
+</body>
+</html>
